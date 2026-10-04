@@ -1,0 +1,90 @@
+Practical 1
+Question 1- Creating simple applications and testing
+applications.
+Theory (Handwritten)
+ASP.NET Core is a free, open-source, cross-platform web development framework created by Microsoft for building modern web applications, APIs, cloud services, and microservices. It runs on Windows, Linux, and macOS. MVC
+MVC (Model-View-Controller) is a software design pattern used to develop web applications by separating an application into three main components: Model, View, and Controller. This separation makes the application easier to develop, test, maintain, and manage.
+Model
+The Model is the component of MVC that represents the application's data and business logic. It is responsible for managing the data, performing calculations, and interacting with the database. The Model contains classes and methods that define how data is stored, retrieved, updated, and deleted.
+View
+The View is the user interface component of MVC that displays information to the user and collects user input. It is responsible only for presenting data and does not contain business logic. In ASP.NET Core MVC, views are usually created using Razor (.cshtml) files that generate HTML content displayed in the browser.
+Controller
+The Controller acts as an intermediary between the Model and the View. It receives requests from users, processes those requests, communicates with the Model to obtain or modify data, and then selects the appropriate View to display the results. The Controller contains action methods that respond to user interactions such as button clicks or page requests.
+HomeController.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+namespace WebApplication3.Controllers
+{
+ public class HomeController : Controller
+ {
+ public ActionResult Index()
+ {
+ return View();
+ }
+ public ActionResult About()
+ {
+ ViewBag.Message = "Your application description page.";
+ return View();
+ }
+ public ActionResult Contact()
+ {
+ ViewBag.Message = "Your contact page.";
+ return View();
+ }
+ }
+}
+About.cshtml
+@{
+ ViewBag.Title = "About";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+<p>Use this area to provide additional information.</p> _layout.cshtml
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>@ViewBag.Title - My ASP.NET Application</title>
+ @Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+ <div class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container">
+ <div class="navbar-header">
+ <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbarcollapse">
+ <span class="icon-bar"></span>
+ <span class="icon-bar"></span>
+ <span class="icon-bar"></span>
+ </button>
+@Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class
+= "navbar-brand" })
+ </div>
+<div class="navbar-collapse collapse">
+ <ul class="nav navbar-nav">
+ <li>@Html.ActionLink("Home", "Index", "Home")</li>
+ <li>@Html.ActionLink("About", "About", "Home")</li>
+ <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+ <li>@Html.ActionLink("Security", "Security", "Home")</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+<div class="container body-content">
+ @RenderBody()
+<hr />
+<footer>
+ <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+ </footer>
+ </div>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@RenderSection("scripts", required: false)
+</body>
+</html>
+
+
