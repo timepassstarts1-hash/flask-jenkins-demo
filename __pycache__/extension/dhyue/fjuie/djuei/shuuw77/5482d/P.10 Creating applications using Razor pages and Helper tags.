@@ -1,0 +1,286 @@
+Practical 10
+Tag Helpers in ASP.NET Core are server-side components that allow developers to create
+HTML elements using simple and readable HTML-like syntax in Razor Views. They make it
+easier to generate dynamic HTML and connect HTML elements with server-side models and
+controllers. Tag Helpers reduce the need to write complex HTML and Razor code manually,
+improve readability, and make ASP.NET Core web applications easier to develop and
+maintain.
+Creating an Application Using Razor Pages and Tag Helpers
+Step 1: Open Visual Studio 2019
+1. Start Visual Studio 2019.
+2. Select Create a new project.
+3. Search for:
+ASP.NET Web Application (.NET Framework)
+4. Select it.
+5. Click Next.
+Step 2: Create the Project
+Enter:
+Project Name: StudentRegistration
+Choose a suitable location.
+Select a .NET Framework version available on your computer, for example:
+.NET Framework 4.7.2
+Click Create.
+Step 3: Select MVC Template
+In the next window, select:
+MVC
+You may leave Authentication as:
+No Authentication
+Click Create.
+Visual Studio creates a project with folders similar to:
+StudentRegistration
+│
+├── Controllers
+│
+├── Models
+│
+├── Views
+│ ├── Home
+│ ├── Shared
+│ └── Web.config
+│
+├── Content
+├── Scripts
+└── Global.asax
+Step 4: Create the Student Model
+Right-click the Models folder.
+Select:
+Add → Class
+Enter:
+Student.cs
+Add the following code:
+using System.ComponentModel.DataAnnotations;
+namespace StudentRegistration.Models
+{
+ public class Student
+ {
+ [Required]
+ public string Name { get; set; }
+ [Required]
+ public string Email { get; set; }
+ [Required]
+ public string Password { get; set; }
+ [Required]
+ public string Gender { get; set; }
+ [Required]
+ public string Course { get; set; }
+ public bool Agree { get; set; }
+ }
+}
+The model contains information about the student.
+Step 5: Create the Student Controller
+Right-click the Controllers folder.
+Select:
+Add → Controller
+Select:
+MVC 5 Controller - Empty
+Click Add.
+Enter:
+StudentController
+Click Add.
+Replace the controller code with:
+using System.Web.Mvc;
+using StudentRegistration.Models;
+namespace StudentRegistration.Controllers
+{
+ public class StudentController : Controller
+ {
+ public ActionResult Register()
+ {
+ return View();
+ }
+ [HttpPost]
+ public ActionResult Register(Student student)
+ {
+ if (ModelState.IsValid)
+ {
+ ViewBag.Message = "Student registered successfully!";
+ }
+ return View(student);
+ }
+ }
+}
+Here:
+ Register() displays the registration form.
+ The [HttpPost] method receives the submitted form data.
+ ModelState.IsValid checks validation.
+ ViewBag.Message displays the result.
+Step 6: Create the Razor View
+Right-click inside the Register() method:
+public ActionResult Register()
+Select:
+Add View
+Choose:
+View name: Register
+Template: Empty
+Model class: Student
+If the model class does not appear, you can create the view first and manually
+specify the model.
+The View will be created here:
+Views
+└── Student
+ └── Register.cshtml
+Step 7: Create the Registration Form Using HTML Helpers
+Open:
+Views/Student/Register.cshtml
+Add:
+@model StudentRegistration.Models.Student
+@{
+ ViewBag.Title = "Student Registration";
+}
+<h2>Student Registration</h2>
+@using (Html.BeginForm())
+{
+ <div>
+ @Html.LabelFor(m => m.Name)
+ @Html.TextBoxFor(m => m.Name)
+ @Html.ValidationMessageFor(m => m.Name)
+ </div>
+ <br />
+ <div>
+ @Html.LabelFor(m => m.Email)
+ @Html.TextBoxFor(m => m.Email)
+ @Html.ValidationMessageFor(m => m.Email)
+ </div>
+ <br />
+ <div>
+ @Html.LabelFor(m => m.Password)
+ @Html.PasswordFor(m => m.Password)
+ @Html.ValidationMessageFor(m => m.Password)
+ </div>
+ <br />
+ <div>
+ @Html.LabelFor(m => m.Gender)
+ @Html.RadioButtonFor(m => m.Gender, "Male")
+ Male
+ @Html.RadioButtonFor(m => m.Gender, "Female")
+ Female
+ </div>
+ <br />
+ <div>
+ @Html.LabelFor(m => m.Course)
+ @Html.DropDownListFor(
+ m => m.Course,
+ new SelectList(new[]
+ {
+ "BSc Data Science",
+ "BSc IT",
+ "BCA",
+ "MCA"
+ }),
+ "Select Course"
+ )
+ </div>
+ <br />
+ <div>
+ @Html.CheckBoxFor(m => m.Agree)
+ I agree to the terms and conditions.
+ </div>
+ <br />
+ <input type="submit" value="Register" />
+}
+@if (ViewBag.Message != null)
+{
+ <h3>@ViewBag.Message</h3>
+}
+Step 8: Understand the HTML Helpers
+1. Html.BeginForm()
+This creates an HTML <form> element.
+@using (Html.BeginForm())
+{
+ // Form controls
+}
+It is equivalent to creating a form element manually.
+2. Html.LabelFor()
+Creates a label for a model property.
+@Html.LabelFor(m => m.Name)
+It generates HTML similar to:
+<label for="Name">Name</label>
+3. Html.TextBoxFor()
+Creates a text box.
+@Html.TextBoxFor(m => m.Name)
+It generates an input element associated with the Name property.
+4. Html.PasswordFor()
+Creates a password field.
+@Html.PasswordFor(m => m.Password)
+The entered characters are hidden in the browser.
+5. Html.RadioButtonFor()
+Creates radio buttons.
+@Html.RadioButtonFor(m => m.Gender, "Male")
+and:
+@Html.RadioButtonFor(m => m.Gender, "Female")
+The user can select one gender.
+6. Html.DropDownListFor()
+Creates a dropdown list.
+@Html.DropDownListFor(
+ m => m.Course,
+ new SelectList(new[]
+ {
+ "BSc Data Science",
+ "BSc IT",
+ "BCA",
+ "MCA"
+ }),
+ "Select Course"
+)
+The user can select one course.
+7. Html.CheckBoxFor()
+Creates a checkbox.
+@Html.CheckBoxFor(m => m.Agree)
+The value is stored in the Agree property.
+8. Html.ValidationMessageFor()
+Displays validation errors for a particular property.
+@Html.ValidationMessageFor(m => m.Name)
+Because the model contains:
+[Required]
+public string Name { get; set; }
+the Name field cannot be left empty when validation is performed.
+Step 9: Run the Project
+Press:
+Ctrl + F5
+or click:
+IIS Express
+The browser opens the application.
+Navigate to:
+/Student/Register
+For example:
+https://localhost:xxxxx/Student/Register
+You should see:
+ Student Registration
+Name: [________________]
+Email: [________________]
+Password: [________________]
+Gender: ○ Male ○ Female
+Course: [Select Course ▼]
+☐ I agree to the terms and conditions.
+ [ Register ]
+Step 10: Test Form Submission
+Enter sample data:
+Name : Rahul
+Email : rahul@gmail.com
+Password : 12345
+Gender : Male
+Course : BSc Data Science
+Select:
+I agree to the terms and conditions.
+Click:
+Register
+The controller receives the information:
+[HttpPost]
+public ActionResult Register(Student student)
+If the data is valid:
+ViewBag.Message = "Student registered successfully!";
+The page displays:
+Student registered successfully!
+Step 11: Test Validation
+Run the application again and click Register without entering the required
+fields.
+Because the model contains:
+[Required]
+public string Name { get; set; }
+and similar validation rules for Email, Password, and Course, the validation
+messages will be displayed.
+For example:
+Name is required.
+Email is required.
+Password is required.
+Course is required.
