@@ -1,1 +1,501 @@
+// ==========================================
+// Practical 1 - MongoDB Basics: 1
+// ==========================================
 
+// A. Write a MongoDB query to create and drop database.[cite: 1]
+show dbs
+use Romal
+db.createCollection("Practical1")
+show dbs
+db.dropDatabase()
+
+// B. Write a MongoDB query to create, display and drop collection.[cite: 1]
+use Romal
+show collections
+db.createCollection("Practical1")
+show collections
+db.Practical1.drop()
+
+// C. Write a MongoDB query to insert, query, update and delete a document.[cite: 2]
+use Romal
+db.Doc.insert({Name:"Romal", Age:10})
+db.Doc.find()
+db.Doc.update({Name: "Romal"}, {$set: {Age:20}})
+db.Doc.find()
+db.Doc.remove({"Name": "Romal"})
+db.Doc.find()
+
+// D. Employee Queries
+// 1) Insert and display the documents in the Employee collection.[cite: 2]
+use Employee
+db.col.insertMany([{Name: "Smitu", Salary: 100000, Dept: "ID", City: "Mumbai"}, {Name: "Romal", Salary: 15000, Dept: "IT", City: "Thane"}, {Name: "Sujal", Salary: 9000, Dept: "Tester", City: "Bandra"}, {Name: "Manav", Salary: 30000, Dept: "Finance", City: "Kurla"}, {Name: "Swathi", Salary: 4000, Dept: "Developer", City: "Pune"}])
+db.col.find()
+
+// 2) Display details of employees who live in Mumbai.[cite: 2]
+db.col.find({City: "Mumbai"})
+
+// 3) Display details of employee staying in Kurla and salary greater than 19000.[cite: 3]
+db.col.find({City: "Kurla", Salary: {$gt:19000}})
+
+// 4) Display details of the employee whose salary is greater than equal 10000 but less than 20000.[cite: 3]
+db.col.find({Salary: {$gte:10000, $lt:20000}})
+
+// 5) Display details of employees staying in either thane or mumbai and salary greater than 10000.[cite: 3]
+db.col.find({$or: [{City: "Mumbai"}, {City: "Thane"}], Salary: {$gt:10000}})
+
+// 6) Display details of employee whose salary is not equal to 10000 and working in either developer or tester department.[cite: 3]
+db.col.find({$or: [{Dept: "Developer"}, {Dept: "Tester"}], Salary: {$ne:10000}})
+
+
+// ==========================================
+// Practical 2 - MongoDB Basics: 2
+// ==========================================
+
+// Insert the documents[cite: 4]
+use Data
+db.col.insertMany([{Name: "Romal", Age: 20, Country: "India", Gender: "Female"}, {Name: "Raj", Age: 12, Country: "Russia", Gender: "Male"}, {Name: "Sujal", Age: 25, Country: "USA", Gender: "Male"}, {Name: "Sara", Age: 65, Country: "India", Gender: "Female"}, {Name: "Koyal", Age: 30, Country: "USA", Gender: "Female"}])
+db.col.find()
+
+// 4. Update the country to UK for all female users.[cite: 4]
+db.col.updateMany({Gender: "Female"}, {$set: {Country: "UK"}})
+db.col.find()
+
+// 5. Add the new field company to all the documents.[cite: 4]
+db.col.updateMany({}, {$set: {Company: "Wipro"}})
+db.col.find()
+
+// 6. Delete all the documents where Gender = 'Male'.[cite: 4, 5]
+db.col.remove({"Gender": "Male"})
+db.col.find()
+
+// 1. Find out a count of female users who stay in either India or USA.[cite: 5]
+db.col.find({$or: [{Country: "India"}, {Country: "USA"}], Gender:"Female"}).count()
+
+// 2. Display the first name and age of all female employees.[cite: 5]
+db.col.find({Gender:"Female"}, {Name:1,Age:1})
+
+
+// ==========================================
+// Practical 3 - Aggregate Functions
+// ==========================================
+
+// Insert collection in the database and display all the records.[cite: 6]
+use Aggregate
+db.col.insertMany([{Name: "Romal", Age:17, City: "Mumbai", Salary: 12000}, {Name: "Rohan", Age: 22, City: "Thane", Salary:60000}, {Name: "Sujal", Age: 19, City: "Mumbai", Salary: 3000}, {Name: "Manav", Age: 47, City: "Pune", Salary: 55000}, {Name: "Ria", Age: 34, City: "Mumbai", Salary:83000}])
+db.col.find()
+
+// 1. Group by function to get count.[cite: 6]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$sum:1}}}])
+
+// 2. Sum function.[cite: 6]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$sum:"$Salary"}}}])
+
+// 3. Avg function.[cite: 6]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$avg:"$Salary"}}}])
+
+// 1. Min function[cite: 7]
+db.col.aggregate([{$group:{_id:"$City", cityCount: {$min:"$Salary"}}}])
+
+// 2. Max function.[cite: 7]
+db.col.aggregate([{$group: {_id: "$City", cityCount: {$max:"$Salary"}}}])
+
+// 3. First function[cite: 7]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$first:"$Salary"}}}])
+
+// 4. Last function[cite: 7]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$last:"$Salary"}}}])
+
+// 6. addToSet function[cite: 7]
+db.col.aggregate([{$group: {_id:"$City", cityCount: {$addToSet: "$Salary"}}}])
+
+// 5. Push function[cite: 7]
+db.col.aggregate([{$group: {_id: "$City", cityCount: {$push:"$Salary"}}}])
+
+
+// ==========================================
+// Practical 4 - Java and MongoDB
+// ==========================================
+
+// 1. Insert the document in MongoDB using Java.[cite: 8]
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoClient;
+import org.bson.Document;
+public class insert {
+    public static void main(String[] args) {
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        System.out.println("Connected to the database successfully.");
+        MongoDatabase database = mongo.getDatabase("TYITDB239720");
+        MongoCollection<Document> collection = database.getCollection("myCol");
+        Document document = new Document();
+        document.append("id", 1);
+        document.append("Name", "Romal");
+        document.append("RollNo", 239720);
+        document.append("Age", 20);
+        document.append("College", "MCC");
+        collection.insertOne(document);
+        System.out.println("Document inserted successfully");
+    }
+}
+
+// 1. Update the document in MongoDB using Java.[cite: 10]
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
+public class update {
+    public static void main(String[] args) {
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        DB db = mongo.getDB("TYITDB239720");
+        DBCollection col = db.getCollection("myCol");
+        BasicDBObject query = new BasicDBObject("id", 1);
+        BasicDBObject update = new BasicDBObject();
+        update.put("$set", new BasicDBObject("Age", 27));
+        WriteResult result = col.update(query, update);
+        mongo.close();
+    }
+}
+
+// 1. Retrieve the document in MongoDB using Java[cite: 11]
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoClient;
+import org.bson.Document;
+import java.util.Iterator;
+import com.mongodb.client.FindIterable;
+public class retrieve {
+    public static void main(String[] args) {
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoDatabase database = mongo.getDatabase("TYITDB239720");
+        MongoCollection<Document> collection = database.getCollection("myCol");
+        FindIterable<Document> iterDoc = collection.find();
+        Iterator it = iterDoc.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+}
+
+// 1. Delete the document in MongoDB using Java.[cite: 12]
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoClient;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
+public class delete {
+    public static void main(String[] args) {
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoDatabase database = mongo.getDatabase("TYITDB239720");
+        MongoCollection<Document> collection = database.getCollection("myCol");
+        collection.deleteOne(Filters.eq("id",1));
+        System.out.println("Document deleted successfully");
+    }
+}
+
+
+// ==========================================
+// Practical 5 - PHP
+// ==========================================
+// Setup: copy php_mongo.dll and paste it in xampp--> php--> ext[cite: 14]
+// Edit the configuration in php.ini: extension=php_mongo.dll[cite: 15]
+// Save Files at the location: C:\xampp\htdocs\[cite: 15]
+
+// 1. insert.php[cite: 16]
+<?php
+$m = new MongoClient();
+$db = $m -> MYDB239720;
+$col = $db-> MyCol;
+$doc = array("name" => "Romal", "age" => 20, "dept" => "TYIT", "rollno" => 239720);
+$col -> insert($doc);
+echo "\nDocument inserted successfully";
+?>
+
+// 2. update.php[cite: 17]
+<?php
+$m = new MongoClient();
+$db = $m -> MYDB239720;
+$col = $db-> MyCol;
+$col -> update(array("name" => "Romal"), array('$set'=>array("age" => 19)));
+echo "\nDocument updated successfully";
+?>
+
+// 3. retrieve.php[cite: 18, 19]
+<?php
+$m = new MongoClient();
+$db = $m -> MYDB239720;
+$col = $db-> MyCol;
+$cursor = $col -> find();
+foreach($cursor as $doc) {
+    echo"<br/>";
+    echo $doc["name"]."<br/>";
+    echo $doc["age"]."<br/>";
+    echo $doc["dept"]."<br/>";
+    echo $doc["rollno"]."<br/>";
+}
+?>
+
+// 4. delete.php[cite: 19]
+<?php
+$m = new MongoClient();
+$db = $m -> MYDB239720;
+$col = $db-> MyCol;
+$col -> remove(array("name" => "Romal"));
+echo "\nDocument deleted successfully";
+?>
+
+
+// ==========================================
+// Practical 6 - Python
+// ==========================================
+
+// 1. insert[cite: 20]
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+db = client.TYITDB239720
+def insert():
+    try:
+        name1 = input("Enter the Name:")
+        age1 = input("Enter the Age:")
+        dept1 = input("Enter the Department:")
+        pin1 = input("Enter the Pin No:")
+        db.MyCol.insert_one({"name":name1, "age":age1, "dept":dept1, "pin": pin1})
+        print("Inserted data successfully")
+    except Exception as e:
+        print(str(e))
+insert()
+
+// 2. update()[cite: 21]
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+db = client.TYITDB239720
+def update():
+    try:
+        name1 = input("Enter the Name:")
+        age1 = input("Enter the Age to update:")
+        db.MyCol.update_one({"name":name1},{"$set":{"age":age1}})
+        print("\nRecords updated successfully\n")
+    except Exception as e:
+        print(str(e))
+update()
+
+// 3. Retrieve[cite: 22]
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+db = client.TYITDB239720
+def read():
+    try:
+        Col = db.MyCol.find()
+        print("\nAll data from database TYITDB239720:")
+        for MyCol in Col:
+            print(MyCol)
+    except Exception as e:
+        print(str(e))
+read()
+
+// 4. delete[cite: 22, 23]
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+db = client.TYITDB239720
+def delete():
+    try:
+        name1 = input("Enter the name:")
+        db.MyCol.delete_one({"name":name1})
+        print("\nData deleted successfully")
+    except Exception as e:
+        print(str(e))
+delete()
+
+
+// ==========================================
+// Practical 7 - jQuery Basics 
+// ==========================================
+
+// 1. Write a jQuery to check the contents of the elements on the button click.[cite: 24]
+<!DOCTYPE html>
+<head>
+<script src="jquery-3.6.1.min.js"></script>
+<script>
+$(document).ready(function () {
+    $("#btn").click(function(){ document.write("Hello Romal") })
+})
+</script>
+</head>
+<body>
+<p>Romal: 239720</p><button id="btn">Click Me</button>
+</body>
+
+// 2. Write a jQuery to select elements by class name, id and element names.[cite: 25]
+<!DOCTYPE html>
+<head>
+<script src="jquery-3.6.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    $(".class1").css("background", "lightblue");
+    $("#id1").css("background", "pink");
+    $("h2").css("background", "lightgreen");
+})
+</script>
+</head>
+<body>
+<p class="class1">Romal: 239720</p>
+<p id="id1">Romal Shah</p>
+<h2>Welcome Romal</h2>
+</body>
+
+// 3. Write jQuery to show the use of click(), hover(), on(), trigger(), off() events.[cite: 26, 27]
+<!DOCTYPE html>
+<head>
+<script src="jquery-3.6.1.min.js"></script>
+<script>
+$(document).ready(function () {
+    $("#b1").hover(function(){ document.write("Hello Romal") })
+    $("p").on("click", function() { $(this).css("background", "yellow"); });
+    $("#b2").click(function(){ $("p").off("click"); });
+    $("#b3").on("click", function(){ $("#p1").hide(); }); 
+    $("input").select(function(){ $("input").after("Text Marked!") });
+    $("#b4").click(function(){ $("input").trigger("select"); });
+})
+</script>
+</head>
+<body>
+<button id="b1">Hover</button><br>
+<p>Welcome to the Mulund College</p><br>
+<p>Romal: 239720</p><br>
+<button id="b2">Off</button><br>
+<p id="p1">Hello Romal</p><br>
+<button id="b3">On</button><br>
+<input type="text" value="Romal 239720"><br>
+<button id="b4">Trigger</button><br>
+</body>
+
+
+// ==========================================
+// Practical 8 - jQuery Effects
+// ==========================================
+
+// Note: Ensure <script src="jquery-3.6.1.min.js"></script> and standard HTML boilerplate is wrapped around these snippets. 
+
+// 1. Write a jQuery to create animated show hide effect.[cite: 28, 29]
+$(document).ready(function(){
+    $("#b1").click(function(){ $("p").hide(); });
+    $("#b2").click(function(){ $("p").show(); })
+})
+
+// 2. Write a jQuery to create a simple toggle effect.[cite: 29]
+$(document).ready(function(){
+    $("button").click(function(){ $("p").toggle(); });
+})
+
+// 3. Write a jQuery to create fade-in and fade-out effect.[cite: 30, 31]
+$(document).ready(function(){
+    $(".c1").click(function(){ $("p").fadeOut(5000); });
+    $(".c2").click(function(){ $("p").fadeIn(5000); })
+})
+
+// 4. Write a jQuery to create fade toggle effect.[cite: 31]
+$(document).ready(function(){
+    $("button").click(function(){ $("p").fadeToggle(5000); });
+})
+
+// 5. Write a jQuery to create slide-up and slide-down effect.[cite: 32]
+$(document).ready(function(){
+    $("#b1").click(function(){ $("p").slideUp(3000); });
+    $("#b2").click(function(){ $("p").slideDown(3000); })
+})
+
+// 6. Write a jQuery to create slide toggle effect.[cite: 33]
+$(document).ready(function(){
+    $("button").click(function(){ $("p").slideToggle(5000); })
+})
+
+// 7. Write a jQuery to create Mouse Event.[cite: 34]
+$(document).ready(function(){
+    $("#p1").mouseleave(function(){ alert("Bye! You now leave p1"); })
+})
+
+// 8. Write a jQuery to create animation effect.[cite: 36]
+$(document).ready(function(){
+    $("button").click(function(){ $("img").animate({left:50}); })
+})
+
+// 9. Write a jQuery to animate multiple css properties.[cite: 38]
+$(document).ready(function(){
+    $("#b1").click(function(){
+        $("#div1").animate({width:"150px", height:"150px", opacity:"0.5", left:"150"});
+    })
+})
+
+// 10. Write a jQuery to perform method of chaining.[cite: 39]
+$(document).ready(function(){
+    $("button").click(function(){
+        $("#p1").css("color", "blue").slideUp(2000).slideDown(2000)
+    })
+})
+
+
+// ==========================================
+// Practical 9 - jQuery Callbacks & HTML DOM
+// ==========================================
+
+// 1. Write a jQuery effect method with a callback function.[cite: 41]
+$(document).ready(function(){
+    $("button").click(function(){
+        $("p").hide("slow", function(){ alert("The paragraph is now hidden") })
+    })
+})
+
+// 2. Write a jQuery to get and set text context of the elements.[cite: 42]
+$(document).ready(function(){
+    $("#b1").click(function(){ var str = $("p").text(); alert(str); })
+    $("#b2").click(function(){ $("p").text("Hello World"); })
+})
+
+// 3. Write a jQuery to get and set HTML contents of the elements.[cite: 43, 44]
+$(document).ready(function(){
+    $("#b1").click(function(){ var str = $("p").html(); alert(str); })
+    $("#b2").click(function(){ $("p").html("<b>Hello World<b>"); })
+})
+
+
+// ==========================================
+// Practical 10 - JSON
+// ==========================================
+
+// 1. Creating JSON[cite: 46]
+<html><body>
+<script type="text/javascript">
+var data={ "name":"Romal", "age":20, "dept":"IT" }
+document.writeln(JSON.stringify(data)+"</br>");
+document.writeln(JSON.stringify(data, ["name","age","dept"])+"<br/>");
+document.writeln(JSON.stringify(data, ["name","age","dept"], 5));
+</script>
+</body></html>
+
+// 2. Parsing JSON[cite: 47, 48]
+<html><body>
+<script type="text/javascript">
+var data = '{"name":"Romal","age":20,"dept":"IT"}';
+var jsonObj = JSON.parse(data, function(name, value) {
+    if (name == "sem") {
+        return undefined;
+    } else {
+        return value;
+    }
+});
+for (key in jsonObj) {
+    document.writeln("<br/>" + key + ":" + jsonObj[key]);
+}
+</script>
+</body></html>
+
+// 3. Parsing JSON Simple Object[cite: 49, 50]
+<html><body>
+<script type="text/javascript">
+var data = '{"name":"Romal","age":20,"dept":"IT"}';
+var obj = JSON.parse(data);
+for(var key in obj) {
+    document.writeln("<br/>"+key+":"+obj[key]);
+}
+</script>
+</body></html>
